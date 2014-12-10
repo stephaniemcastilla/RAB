@@ -1,0 +1,47 @@
+input.submit-link {
+    background: transparent;
+    border: 0;
+    cursor:pointer;
+    margin: 0;
+    padding: 0;
+    color: #034af3;
+    text-decoration: underline;
+}
+
+input.submit-link:visited {
+    color: #505abc;
+}
+
+input.submit-link:hover {
+    color: #1d60ff;
+    text-decoration: none;
+}
+
+input.submit-link:active {
+    color: #12eb87;
+}
+
+a {
+  color: #15b3c6;
+}
+
+.container {
+  width: 960px;
+}
+
+.empty_table{
+  margin-top: -20px;
+  padding: 15px;
+  width: 100%;
+  background: #f9f9f9;
+  text-align: center;
+}
+
+.centered {
+  width: 1000px;
+  height: 400px;
+  padding: 100px;
+  font-size: 40px;
+  margin: auto;
+  text-align: center;
+}
