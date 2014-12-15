@@ -45,3 +45,9 @@ a {
   margin: auto;
   text-align: center;
 }
+
+.close_button{
+  float: right;
+  margin: 20px;
+  font-size: 30px;
+}

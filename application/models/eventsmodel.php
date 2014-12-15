@@ -16,7 +16,7 @@ class EventsModel
 
     public function getAllEvents()
     {
-      $sql = "SELECT * FROM events INNER JOIN programs on events.program_id = programs.id";
+      $sql = "SELECT * FROM events INNER JOIN programs on events.program_id = programs.id GROUP BY events.id";
       $query = $this->db->prepare($sql);
       $query->execute();
 

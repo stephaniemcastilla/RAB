@@ -33,6 +33,8 @@ class Timelogs extends Controller
     }
     public function fullscreen()
     {   
+        $event = $_GET["event"];
+
         // load views. 
         require 'application/views/_templates/fullscreen_header.php';
         require 'application/views/timelogs/fullscreen.php';

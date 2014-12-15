@@ -101,7 +101,7 @@ class Volunteers extends Controller
                   }
               }
             }else{
-              $target_file = "/public/uploads/user.png";
+              $target_file = "public/uploads/user.png";
             }
             
             // load model, perform an action on the model
@@ -234,7 +234,7 @@ class Volunteers extends Controller
                       
             foreach($volunteer as $volunteer){
                         
-              if ($volunteer->photo!=='/public/uploads/user.png'){
+              if ($volunteer->photo!=='public/uploads/user.png'){
               $volunteer_photo = $volunteer->photo;
               echo $volunteer_photo;
               unlink($volunteer_photo);
@@ -281,6 +281,21 @@ class Volunteers extends Controller
           // where to go after volunteer has been deleted
           
         }
+    }
+    public function suggestVolunteers()
+    {
+      $keyword = '%'.$_POST['keyword'].'%';
+      $event = $_POST['event'];
+      
+      $volunteers_model = $this->loadModel('VolunteersModel');
+      $volunteers = $volunteers_model->getSuggestedVolunteers($keyword);
+      
+      foreach ($volunteers as $volunteer) {
+        echo "<li style='list-style: none; text-align: left;'>".$volunteer->firstname." ".$volunteer->lastname."<a href='/rab/fullscreen/sign_in?event=".$event."&volunteer=".$volunteer->id."' class='btn btn-primary' style='float: right; margin-top: 15px;'>SIGN IN</a></li>";
+      }
+      
+      echo "<div class='btn btn-default' style='margin: 50px;'>Don't see your name? Register now!</div>";
+      
     }
     
 }
