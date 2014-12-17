@@ -195,12 +195,12 @@ class VolunteersModel
   
     public function getSuggestedVolunteers($keyword)
     {
-      $sql = "SELECT * FROM contacts WHERE is_volunteer = '1' AND lastname LIKE (:keyword) ORDER BY lastname";
+      //updated to not show currently signed in contacts
+      $sql = "SELECT * FROM contacts WHERE is_volunteer = '1' AND lastname LIKE (:keyword) AND id NOT IN (SELECT DISTINCT timelogs.contact_id FROM timelogs WHERE total_time IS NULL) ORDER BY lastname";
       $query = $this->db->prepare($sql);
       $query->bindParam(':keyword', $keyword, PDO::PARAM_STR);
       $query->execute();
       
-
       // fetchAll() is the PDO method that gets all result rows, here in object-style because we defined this in
       // libs/controller.php! If you prefer to get an associative array as the result, then do
       // $query->fetchAll(PDO::FETCH_ASSOC); or change libs/controller.php's PDO options to

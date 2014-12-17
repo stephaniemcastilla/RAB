@@ -33,11 +33,43 @@ class Timelogs extends Controller
     }
     public function fullscreen()
     {   
+        //make sure event_id is set, else drop to events index
+        if(!isset($_GET["event"])){
+            header('location: ' . URL . 'events/'); 
+        }
         $event = $_GET["event"];
+        $timelogs_model = $this->loadModel('TimeLogsModel');
+        $open_timelogs = $timelogs_model->getOpenTimeLogsFromEvent($event);
 
-        // load views. 
+        // load views
         require 'application/views/_templates/fullscreen_header.php';
         require 'application/views/timelogs/fullscreen.php';
+    }
+    public function sign_in(){
+        
+        $event_id = $_GET["event"];
+        $contact = $_GET["contact"];
+        $timelogs_model = $this->loadModel('TimeLogsModel');
+
+        //set start date/time, null for end time
+        $timelogs_model->addTimelog($contact, $event_id, date("Y-m-d H:i:s"), "null");
+
+        header('location: ' . URL . 'timelogs/fullscreen?event=' . $event_id);        
+    }
+    public function sign_out(){
+
+        $timelog_id = $_GET["id"];
+           
+        $timelogs_model = $this->loadModel('TimeLogsModel');
+        $timelog = $timelogs_model->getTimeLog($timelog_id);
+
+        $time_out = date("Y-m-d H:i:s"); 
+        $timelogs_model->updateTimeLog($timelog->id, $timelog->contact_id, $timelog->event_id, $timelog->time_in, $time_out);
+        
+        header('location: ' . URL . 'timelogs/fullscreen?event=' . $timelog->event_id);
+        
+        //TODO
+        //redirect: show time logged in overlay?
     }
     public function newTimelog()
     { 
@@ -53,14 +85,6 @@ class Timelogs extends Controller
       require 'application/views/_templates/footer.php';
     }
     
-    /**
-     * ACTION: addVolunteer
-     * This method handles what happens when you move to http://yourproject/volunteers/addvolunteer
-     * IMPORTANT: This is not a normal page, it's an ACTION. This is where the "add a contact" form on contacts/index
-     * directs the user after the form submit. This method handles all the POST data from the form and then redirects
-     * the user back to contacts/index via the last line: header(...)
-     * This is an example of how to handle a POST request.
-     */
     public function addTimelog()
     {
         // if we have POST data to create a new contact entry

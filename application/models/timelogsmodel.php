@@ -15,7 +15,7 @@ class TimeLogsModel
     }
 
     /**
-     * Get all contacts from database
+     * Get all timelogs from database
      */
     public function getAllTimeLogs()
     {
@@ -29,23 +29,40 @@ class TimeLogsModel
         // $options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC ...
         return $query->fetchAll();
     }
-    
+
     /**
-     * Add a contact to database
-     * @param string $firstname Firstname
-     * @param string $lastname Lastname
-     * @param string $email Email
+     * Get all open time logs (no set time_out) from the passed event
+     * returning contact information to be displayed in list of currently signed in contacts
      */
-    public function addTimeLog($volunteer, $date, $timein, $timeout, $totaltime)
+    public function getOpenTimeLogsFromEvent($event_id)
     {
-        $timein = $date." ".$timein;
-        $timeout = $date." ".$timeout;
-        $totaltime = 1;
-        $program_id = 1;
-        
-        $sql = "INSERT INTO timelogs (contact_id, program_id, time_in, time_out, total_time) VALUES (:volunteer, :program_id, :timein, :timeout, :totaltime)";
+        $sql = "SELECT timelogs.id as id, timelogs.contact_id as contact_id, timelogs.time_in as time_in, contacts.firstname as firstname, contacts.lastname as lastname FROM timelogs INNER JOIN contacts on timelogs.contact_id = contacts.id WHERE timelogs.event_id=:event_id AND timelogs.total_time IS NULL;";
         $query = $this->db->prepare($sql);
-        $query->execute(array(':volunteer' => $volunteer, ':program_id' => $program_id, ':timein' => $timein, ':timeout' => $timeout, ':totaltime' => $totaltime));
+        $query->execute(array(':event_id' => $event_id));
+
+        return $query->fetchAll();
     }
 
+    public function getTimeLog($id)
+    {
+        $sql = "SELECT * FROM timelogs WHERE id=:id;";
+        $query = $this->db->prepare($sql);
+        $query->execute(array(':id' => $id));
+
+        return $query->fetch();
+    }
+ 
+    public function addTimeLog($volunteer, $event_id, $timein, $timeout)
+    {  
+        $sql = "INSERT INTO timelogs (contact_id, event_id, time_in, time_out) VALUES (:volunteer, :event_id, :timein, :timeout)";
+        $query = $this->db->prepare($sql);
+        $query->execute(array(':volunteer' => $volunteer, ':event_id' => $event_id, ':timein' => $timein, ':timeout' => $timeout));
+    }
+    
+    public function updateTimeLog($id, $contact_id, $event_id, $time_in, $time_out)
+    {
+        $sql = "UPDATE timelogs SET contact_id = :contact_id, event_id = :event_id, time_in = :time_in, time_out = :time_out WHERE id = :id;";
+        $query = $this->db->prepare($sql);
+        $query->execute(array(':contact_id' => $contact_id, ':event_id' => $event_id, ':time_in' => $time_in, ':time_out' => $time_out,':id' => $id)); 
+    }
 }

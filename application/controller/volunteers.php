@@ -291,7 +291,7 @@ class Volunteers extends Controller
       $volunteers = $volunteers_model->getSuggestedVolunteers($keyword);
       
       foreach ($volunteers as $volunteer) {
-        echo "<li style='list-style: none; text-align: left;'>".$volunteer->firstname." ".$volunteer->lastname."<a href='/rab/fullscreen/sign_in?event=".$event."&volunteer=".$volunteer->id."' class='btn btn-primary' style='float: right; margin-top: 15px;'>SIGN IN</a></li>";
+        echo "<li style='list-style: none; text-align: left;'>".$volunteer->firstname." ".$volunteer->lastname."<a href='" . URL . "timelogs/sign_in?event=" . $event . "&contact=" . $volunteer->id . "' class='btn btn-primary' style='float: right; margin-top: 15px;'>SIGN IN</a></li>";
       }
       
       echo "<div class='btn btn-default' style='margin: 50px;'>Don't see your name? Register now!</div>";
