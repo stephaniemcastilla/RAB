@@ -105,7 +105,7 @@
                 <tr>
                     <td><input class="event-check" value="<?php if (isset($event->id)) echo $event->id; ?>" name="event[]" type="checkbox"/></td>
                     <td><?php if (isset($event->date)) echo $event->date; ?></td>
-                    <td><?php if (isset($event->program_id)) echo $event->name; ?></td>
+                    <td><?php if (isset($event->name)) echo $event->name; ?></td>
                     <td><?php if (isset($event->start_time)) echo $event->start_time; ?></td>
                     <td><?php if (isset($event->end_time)) echo $event->end_time; ?></td>
                     <td>
