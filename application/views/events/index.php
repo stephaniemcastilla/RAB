@@ -109,7 +109,7 @@
                     <td><?php if (isset($event->start_time)) echo $event->start_time; ?></td>
                     <td><?php if (isset($event->end_time)) echo $event->end_time; ?></td>
                     <td>
-                      <a class="view" href="<?php echo URL . 'timelogs/fullscreen?event=' . $event->id; ?>">log</a>
+                      <a class="view" href="<?php echo URL . 'timelogs/choice?event=' . $event->id; ?>">log</a>
                       <a class="view" href="<?php echo URL . 'events/viewVolunteer/' . $event->id; ?>">view</a>
                       <a class="edit" href="<?php echo URL . 'events/editVolunteer/' . $event->id; ?>">edit</a>
                     </td>

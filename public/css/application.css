@@ -39,15 +39,47 @@ a {
 
 .centered {
   width: 1000px;
-  height: 400px;
   padding: 100px;
   font-size: 40px;
   margin: auto;
   text-align: center;
 }
 
+.confirmout {
+  width: 1000px;
+  padding: 100px;
+  font-size: 40px;
+  margin: auto;
+  text-align: center;
+}
+
+.confirmout a {
+    background:#666;
+    padding: 30px;
+}
+
+.confirmout a:hover{
+    text-decoration:none;
+}
 .close_button{
   float: right;
   margin: 20px;
   font-size: 30px;
+}
+
+table.sign{
+    width: 600px;
+    margin-left: auto;
+    margin-right:auto;
+    margin-top:100px;
+    text-align:center;
+}
+
+.sign td a { 
+    background:#666;
+    padding: 30px;
+}
+
+.sign td a:hover{
+    text-decoration:none;
 }

@@ -16,13 +16,9 @@ class Timelogs extends Controller
      */
     public function index()
     {
-        // load a model, perform an action, pass the returned data to a variable
-        // NOTE: please write the name of the model "LikeThis"
         $timelogs_model = $this->loadModel('TimeLogsModel');
         $timelogs = $timelogs_model->getAllTimeLogs();
 
-        // load another model, perform an action, pass the returned data to a variable
-        // NOTE: please write the name of the model "LikeThis"
         $stats_model = $this->loadModel('StatsModel');
         $amount_of_timelogs = $stats_model->getAmountOfTimeLogs();
         
@@ -31,43 +27,128 @@ class Timelogs extends Controller
         require 'application/views/timelogs/index.php';
         require 'application/views/_templates/footer.php';
     }
-    public function fullscreen()
-    {   
-        //make sure event_id is set, else drop to events index
-        if(!isset($_GET["event"])){
-            header('location: ' . URL . 'events/'); 
-        }
-        $event = $_GET["event"];
-        $timelogs_model = $this->loadModel('TimeLogsModel');
-        $open_timelogs = $timelogs_model->getOpenTimeLogsFromEvent($event);
+    /*
+     * main function after admin 'starts' the event
+     * this is where contacts and sign in and out from
+     * during the event, all pages fall back to here
+     */
+    public function choice()
+    {
+        $event_id = $_GET["event"];
+        
+        $events_model = $this->loadModel('EventsModel');
+        $info = $events_model->getInfo($event_id);
 
         // load views
         require 'application/views/_templates/fullscreen_header.php';
-        require 'application/views/timelogs/fullscreen.php';
+        require 'application/views/timelogs/choice.php';
     }
+    /*
+     * function once users chooses to sign in
+     * allows users to search by last name and create a time log
+     * if contact is passed via url, create time log and head to confirmation page to confirm start time
+     */
     public function sign_in(){
         
         $event_id = $_GET["event"];
-        $contact = $_GET["contact"];
-        $timelogs_model = $this->loadModel('TimeLogsModel');
 
-        //set start date/time, null for end time
-        $timelogs_model->addTimelog($contact, $event_id, date("Y-m-d H:i:s"), "null");
-
-        header('location: ' . URL . 'timelogs/fullscreen?event=' . $event_id);        
+        if(isset($_GET["contact"])){
+            $contact_id = $_GET["contact"];
+            $timelogs_model = $this->loadModel('TimeLogsModel');
+            $id = $timelogs_model->addTimelog($contact_id, $event_id, date("Y-m-d H:i:s"), "null");
+          
+            header('location: ' . URL . 'timelogs/confirmin?id=' . $id . '&event=' . $event_id);
+        }
+        
+        // load views
+        require 'application/views/_templates/fullscreen_header.php';
+        require 'application/views/timelogs/signin.php';        
     }
-    public function sign_out(){
+    /*
+     * after sign in, allows user to edit start time
+     */
+    public function confirmin(){
 
-        $timelog_id = $_GET["id"];
-           
         $timelogs_model = $this->loadModel('TimeLogsModel');
-        $timelog = $timelogs_model->getTimeLog($timelog_id);
 
-        $time_out = date("Y-m-d H:i:s"); 
-        $timelogs_model->updateTimeLog($timelog->id, $timelog->contact_id, $timelog->event_id, $timelog->time_in, $time_out);
+        //process submission (with possible time update)
+        if(isset($_POST['submitted'])){
+
+            //TODO: validate data
+            $time = $_POST['timein'];
+            $date = $_POST['date'];
+            $timelog_id = $_POST['id'];
+            
+            $timelog = $timelogs_model->getTimeLog($timelog_id);
+            $timelogs_model->updateTimeLog($timelog->id, $timelog->contact_id, $timelog->event_id, $date . ' ' . $time, $timelog->time_out);
+  
+            $event_id = $_POST['event_id'];
+
+            //head back to full screen choice for correct event
+            header('location: ' . URL . 'timelogs/choice?event=' . $event_id );
+        }
+
+        $timelog_id = $_GET['id'];
+        $event_id = $_GET['event'];
         
-        header('location: ' . URL . 'timelogs/fullscreen?event=' . $timelog->event_id);
+        $info = $timelogs_model->getTimelogAndContact($timelog_id);
+
+        require 'application/views/_templates/fullscreen_header.php';
+        require 'application/views/timelogs/confirmin.php';
+    }
+    /*
+     * once the user starts to log out, this page shows the total time logged by the user,
+     * allows the users to see all their logs and update the current one
+     */
+    public function confirmout()
+    {
+        $timelogs_model = $this->loadModel('TimeLogsModel');
         
+        if(isset($_POST['submitted'])){
+
+            //TODO: validate data
+            $time = $_POST['timeout'];
+            $date = $_POST['date'];
+            $timelog_id = $_POST['id'];
+            $event_id = $_POST['event'];
+
+            $timelog = $timelogs_model->getTimeLog($timelog_id);
+            $timelogs_model->updateTimeLog($timelog->id, $timelog->contact_id, $timelog->event_id, $timelog->time_in, $date . ' ' . $time);
+        }
+        
+        if(!isset($event_id)){
+             $event_id = $_GET['event'];
+        }
+        if(!isset($timelog_id)){
+            $timelog_id = $_GET['id'];
+        }
+
+        $timelogs = $timelogs_model->getTimeLogsForUser($timelog_id);
+        $sum_time = reset($timelogs_model->getTotalTimeForUser($timelog_id));
+        $firstname = reset($timelogs_model->getFirstName($timelog_id));
+
+        require 'application/views/_templates/fullscreen_header.php';
+        require 'application/views/timelogs/confirmout.php';
+    }
+    public function sign_out()
+    {
+
+        $event_id = $_GET["event"];
+        $timelogs_model = $this->loadModel('TimeLogsModel');
+
+        if(isset($_GET['timelog'])){
+            
+            $timelog_id = $_GET['timelog'];
+            $time_out = date("Y-m-d H:i:s"); 
+            $timelog = $timelogs_model->getTimeLog($timelog_id);
+            $timelogs_model->updateTimeLog($timelog->id, $timelog->contact_id, $timelog->event_id, $timelog->time_in, $time_out);
+            header('location: ' . URL . 'timelogs/confirmout?id=' . $timelog_id . '&event=' . $event_id);
+        }
+           
+        $timelogs = $timelogs_model->getOpenTimeLogsFromEvent($event_id);
+
+        require 'application/views/_templates/fullscreen_header.php';
+        require 'application/views/timelogs/signout.php';
         //TODO
         //redirect: show time logged in overlay?
     }

@@ -39,6 +39,15 @@ class EventsModel
         // $options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC ...
         return $query->fetchAll();
     }
+
+    public function getInfo($event_id)
+    {
+        $sql = "SELECT programs.name AS name, events.date AS date FROM events INNER JOIN programs ON events.program_id = programs.id WHERE events.id = :id LIMIT 1;";
+        $query = $this->db->prepare($sql);
+        $query->execute(array(':id' => $event_id));
+        
+        return $query->fetch();
+    }
     
     public function getSearchedEvents($search)
     {
